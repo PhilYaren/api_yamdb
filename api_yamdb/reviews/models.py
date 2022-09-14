@@ -1,13 +1,14 @@
-from django.contrib.auth.models import AbstractUser, AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-
+from django.contrib.auth.tokens import default_token_generator
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+    
 from .utils import ADMIN, MODERATOR, USER
 from .validators import only_allowed_characters, no_me_username
 
-"""От Саши: Описал модели по ТЗ"""
-"""Не очень понял, что с Юзером делать"""
-"""И еще не понял, что делать с ЖанрТитулом и зачем он"""
+
 
 # Прописаны роли для пользователей
 USER_ROLES = [
@@ -49,9 +50,32 @@ class User(AbstractUser):
     bio = models.TextField(
         blank=True
     )
+    confirmation_code = models.CharField(
+        max_length=256,
+        null=True
+    )
+
+    @property
+    def is_admin(self):
+        return self.role == ADMIN
+    
+    @property
+    def is_user(self):
+        return self.role == USER
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
 
 
-
+@receiver(post_save, sender=User)
+def post_save(sender, instance, created, **kwargs):
+    if created:
+        confirmation_code = default_token_generator.make_token(
+            instance
+        )
+        instance.confimation_code = confirmation_code
+        instance.save()
 
 
 class Category(models.Model):
@@ -172,7 +196,7 @@ class Comment(models.Model):
         verbose_name='Автор'
     )
     pub_date = models.DateTimeField(
-        'ата публикации',
+        'дата публикации',
         auto_now_add=True,
         db_index=True
     )
