@@ -18,8 +18,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'djoser',
     'api',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -33,6 +33,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'api_yamdb.urls'
+
+AUTH_USER_MODEL = 'reviews.User' #от Саши: коммит Ярослава, не делал изменений в этой ветке
 
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
 TEMPLATES = [
