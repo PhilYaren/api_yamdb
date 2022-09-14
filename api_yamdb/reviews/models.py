@@ -2,7 +2,8 @@ from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from api.validators import only_allowed_characters, no_me_username
+from reviews.utils import ADMIN, MODERATOR, USER
+from reviews.validators import only_allowed_characters, no_me_username
 
 """От Саши: Описал модели по ТЗ"""
 """Не очень понял, что с Юзером делать"""
@@ -10,9 +11,9 @@ from api.validators import only_allowed_characters, no_me_username
 
 # Прописаны роли для пользователей
 USER_ROLES = [
-    ('admin', 'admin'),
-    ('user', 'user'),
-    ('moderator', 'moderator')
+    (ADMIN, ADMIN),
+    (USER, USER),
+    (MODERATOR, MODERATOR)
 ]
 
 
@@ -43,7 +44,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=50,
         choices=USER_ROLES,
-        default='user'
+        default=USER
     )
     bio = models.TextField(
         blank=True

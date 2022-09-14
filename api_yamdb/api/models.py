@@ -48,7 +48,6 @@ class User(AbstractUser):
     )
 
 
-
 class Category(models.Model):
     '''Категории произведений'''
     name = models.CharField(
