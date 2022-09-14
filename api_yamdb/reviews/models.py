@@ -1,17 +1,53 @@
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.core.validators import MaxValueValidator, MinValueValidator
-
 from django.db import models
+
+from api.validators import only_allowed_characters, no_me_username
 
 """От Саши: Описал модели по ТЗ"""
 """Не очень понял, что с Юзером делать"""
 """И еще не понял, что делать с ЖанрТитулом и зачем он"""
 
+# Прописаны роли для пользователей
+USER_ROLES = [
+    ('admin', 'admin'),
+    ('user', 'user'),
+    ('moderator', 'moderator')
+]
 
-class User():
-    pass
 
-    class Meta:
-        pass
+# Нужно доделать
+class User(AbstractUser):
+    '''Переопределение полей пользователя'''
+    username = models.CharField(
+        max_length=150,
+        validators=(
+            no_me_username,  # Запрет на имя me
+            only_allowed_characters  # Запрет на определенные символы
+        ),
+        blank=False,
+        unique=True
+    )
+    first_name = models.CharField(
+        unique=True,
+        max_length=150,
+    )
+    last_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+    email = models.EmailField(
+        max_length=254,
+        blank=False
+    )
+    role = models.CharField(
+        max_length=50,
+        choices=USER_ROLES,
+        default='user'
+    )
+    bio = models.TextField(
+        blank=True
+    )
 
 
 
