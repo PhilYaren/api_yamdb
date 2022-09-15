@@ -21,3 +21,28 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             pass
 
+
+
+
+
+
+
+class TitleViewset(viewsets.ModelViewSet):
+    pass
+
+
+class GenreViewset(viewsets.ModelViewSet):
+    pass
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    pass
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    pass
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    pass
+
