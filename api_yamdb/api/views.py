@@ -1,8 +1,13 @@
 from multiprocessing.spawn import import_main_path
 from django.shortcuts import render
+from django.db.models import Avg
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 
+from reviews.models import Category, Genre, Title
+from .permissions import (
+    AdminOnly, IsAdminOrReadOnly, IsModeratorAuthorOrReadOnly
+)
 from .serializers import (
     AdminSerializer, UserSerializer,
     CategorySerializer, CommentSerializer,
@@ -28,15 +33,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewset(viewsets.ModelViewSet):
-    pass
+    queryset = Title.objects.all() # рейтинг Avg? через .annotate?
+    permission_classes = (IsAdminOrReadOnly,)
+
 
 
 class GenreViewset(viewsets.ModelViewSet):
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSeializer   # Опечатка в имени сериализатора
+
+    def get_serializer_class(self):
+        pass
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
