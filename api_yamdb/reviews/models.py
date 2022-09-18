@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
     
 from .utils import ADMIN, MODERATOR, USER
-from .validators import only_allowed_characters, no_me_username
+from .validators import OnlyAllowedCharacters, no_me_username
 
 
 
@@ -25,14 +25,14 @@ class User(AbstractUser):
         max_length=150,
         validators=(
             no_me_username,  # Запрет на имя me
-            only_allowed_characters  # Запрет на определенные символы
+            OnlyAllowedCharacters  # Запрет на определенные символы
         ),
         blank=False,
         unique=True
     )
     first_name = models.CharField(
-        unique=True,
         max_length=150,
+        blank=True
     )
     last_name = models.CharField(
         max_length=150,
@@ -40,7 +40,8 @@ class User(AbstractUser):
     )
     email = models.EmailField(
         max_length=254,
-        blank=False
+        blank=False,
+        unique=True
     )
     role = models.CharField(
         max_length=50,
@@ -52,7 +53,8 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(
         max_length=256,
-        null=True
+        null=True,
+        default='ABCD'
     )
 
     @property
@@ -67,15 +69,6 @@ class User(AbstractUser):
     def is_moderator(self):
         return self.role == MODERATOR
 
-
-@receiver(post_save, sender=User)
-def post_save(sender, instance, created, **kwargs):
-    if created:
-        confirmation_code = default_token_generator.make_token(
-            instance
-        )
-        instance.confimation_code = confirmation_code
-        instance.save()
 
 
 class Category(models.Model):

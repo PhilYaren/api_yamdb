@@ -1,5 +1,7 @@
 import uuid
 from django.core.mail import EmailMessage
+
+
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -11,14 +13,19 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 
+
 from reviews.models import Category, Genre, Title, Comment, User
 from .permissions import AdminOnly, IsAdminOrReadOnly
+
 from .serializers import (
     AdminSerializer, TokenSerializer, UserSerializer,
     SignUpSerializer, CategorySerializer,
     CommentSerializer, GenreSerializer,
-    ReviewSerializer, TitleSerializer, TitlePostSerializer
+    ReviewSerializer, TitleSerializer,
+    TitlePostSerializer
 )
+
+
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -96,6 +103,7 @@ class TokenViewSet(views.APIView):
             data={'token':'Не верный токен'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))#.order_by('name')

@@ -18,8 +18,10 @@ router.register('categories', CategoryViewSet)
 router.register('genres', GenreViewSet)
 router.register('titles', TitleViewSet)
 
+
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/signup/', UserSignupViewSet.as_view(), name='get_token'),
     path('auth/token/', TokenViewSet.as_view(), name='sign_up')
 ]
+

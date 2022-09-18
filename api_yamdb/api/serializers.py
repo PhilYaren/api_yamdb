@@ -2,7 +2,7 @@ from typing_extensions import Required
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api_yamdb.reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class AdminSerializer(serializers.ModelSerializer):
