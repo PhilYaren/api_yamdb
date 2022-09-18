@@ -11,7 +11,7 @@ from .permissions import (
 from .serializers import (
     AdminSerializer, UserSerializer,
     CategorySerializer, CommentSerializer,
-    GenreSeializer, ReviewSerializer,
+    GenreSerializer, ReviewSerializer,
     TitleSerializer
 )
 
@@ -32,15 +32,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 
-class TitleViewset(viewsets.ModelViewSet):
+class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all() # рейтинг Avg? через .annotate?
     permission_classes = (IsAdminOrReadOnly,)
 
 
 
-class GenreViewset(viewsets.ModelViewSet):
+class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
-    serializer_class = GenreSeializer   # Опечатка в имени сериализатора
+    serializer_class = GenreSerializer   # Опечатка в имени сериализатора
 
     def get_serializer_class(self):
         pass
