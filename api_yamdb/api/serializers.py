@@ -41,6 +41,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
+        exclude = ['id']
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -53,6 +54,7 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
+        exclude = ['id']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -64,6 +66,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
+    #rating = serializers.IntegerField(required=False)
     class Meta:
         model = Title
         fields = (
@@ -71,3 +74,17 @@ class TitleSerializer(serializers.ModelSerializer):
             )
         read_only_fields = ('__all__',)
 
+
+class TitlePostSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field='slug',
+        queryset=Genre.objects.all()
+    )
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')

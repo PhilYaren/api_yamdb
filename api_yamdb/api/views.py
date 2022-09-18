@@ -12,7 +12,7 @@ from .serializers import (
     AdminSerializer, UserSerializer,
     CategorySerializer, CommentSerializer,
     GenreSerializer, ReviewSerializer,
-    TitleSerializer
+    TitleSerializer, TitlePostSerializer
 )
 
 # Create your views here.
@@ -33,22 +33,27 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all() # рейтинг Avg? через .annotate?
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))#.order_by('name')
+    ordering = ['name']
     permission_classes = (IsAdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleSerializer
+        return TitlePostSerializer
 
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer   # Опечатка в имени сериализатора
-
-    def get_serializer_class(self):
-        pass
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 
