@@ -1,7 +1,8 @@
+from typing_extensions import Required
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api_yamdb.reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -15,6 +16,8 @@ class AdminSerializer(serializers.ModelSerializer):
 
 
 class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
@@ -49,7 +52,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'pub_date')
 
 
-class GenreSeializer(serializers.ModelSerializer):
+class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
@@ -63,7 +66,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
-    genre = GenreSeializer(many=True)
+    genre = GenreSerializer(many=True)
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
