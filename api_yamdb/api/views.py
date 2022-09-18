@@ -11,7 +11,6 @@ from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import AccessToken
 from django_filters.rest_framework import DjangoFilterBackend
 
-
 from reviews.models import Category, Genre, Title, Comment, User
 from .permissions import AdminOnly, IsAdminOrReadOnly
 from .serializers import (

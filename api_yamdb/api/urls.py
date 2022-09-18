@@ -8,7 +8,6 @@ from .views import (
     ReviewViewSet, CommentViewSet
 )
 
-
 app_name = 'api'
 
 # from api.views import 
