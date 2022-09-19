@@ -1,3 +1,4 @@
+from asyncore import read
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -47,9 +48,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
+        read_only_fields = ('author', 'pub_date')
 
 
 class GenreSerializer(serializers.ModelSerializer):
