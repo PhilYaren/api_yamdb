@@ -1,4 +1,3 @@
-from typing_extensions import Required
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -44,7 +43,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
-        exclude = ['id']
+        # exclude = ['id']
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -57,25 +56,30 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ('name', 'slug')
-        exclude = ['id']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
+        read_only_fields = ('id', 'author', 'pub_date')
 
 
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    #rating = serializers.IntegerField(required=False)
+    rating = serializers.IntegerField(required=False)
+    
+
+        
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
         read_only_fields = ('__all__',)
+
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
