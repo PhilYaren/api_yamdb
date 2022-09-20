@@ -32,8 +32,6 @@ class Command(BaseCommand):
             mode='r', encoding='utf-8', newline=''
         ) as csv_file:
             reader = csv.DictReader(csv_file)
-
-            print(reader)
             for row in reader:
                 Title.objects.get_or_create(
                     id=row['id'], name=row['name'], year=row['year'],
