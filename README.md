@@ -44,6 +44,24 @@ YaMDb будет доступен по адресу:
 http://127.0.0.1:8000
 ```
 
+# Получение JWT-токена:
+```bash
+POST /api/v1/auth/token/
+```
+
+# Эндпоинты:
+```bash
+GET /api/v1/categories/ - Категории
+GET /api/v1/genres/ - Жанры
+GET /api/v1/titles/ - Произведения
+GET /api/v1/titles/{title_id}/reviews/ - Отзывы к произведению
+GET /api/v1/titles/{title_id}/reviews/{review_id}/comments/ - Комментарии к отзыву
+GET /api/v1/users/ - Пользователи
+```
+
+# Документация:
+Подробная документация доступна по эндпоинту /redoc/
+
 Команда разработки:
 #### [Ярослав Филиппов](https://github.com/PhilYaren)
 #### [Юлия Суркова](https://github.com/Juliosity)
