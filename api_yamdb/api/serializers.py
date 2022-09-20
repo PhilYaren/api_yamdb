@@ -81,7 +81,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             method == 'POST'
             and Review.objects.filter(title=title, author=user).exists()
         ):
-            raise ValidationError
+            raise ValidationError('Вы уже оставили отзыв на это произведение')
         else:
             return super().validate(attrs)
 
@@ -89,6 +89,12 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         read_only_fields = ('id', 'author', 'pub_date')
+
+    def validate_score(self, value):
+        if 0 <= value <= 10:
+            return value
+        else:
+            raise ValidationError('Рейтинг может быть только от 0 до 10')
 
 
 class TitleSerializer(serializers.ModelSerializer):
