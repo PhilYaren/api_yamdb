@@ -1,6 +1,6 @@
-from asyncore import read
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
@@ -18,6 +18,7 @@ class AdminSerializer(serializers.ModelSerializer):
 class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
+
     class Meta:
         model = User
         fields = ('username', 'confirmation_code')
@@ -44,11 +45,14 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('name', 'slug')
-        # exclude = ['id']
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
@@ -62,7 +66,25 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        user = request.user
+        method = request.method
+        id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, id=id)
+        if (
+            method == 'POST'
+            and Review.objects.filter(title=title, author=user).exists()
+        ):
+            raise ValidationError
+        else:
+            return super().validate(attrs)
+
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
@@ -73,16 +95,13 @@ class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
     rating = serializers.IntegerField(required=False)
-    
 
-        
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
         read_only_fields = ('__all__',)
-
 
 
 class TitlePostSerializer(serializers.ModelSerializer):

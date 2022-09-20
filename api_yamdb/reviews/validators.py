@@ -11,5 +11,4 @@ def no_me_username(value):
 
 class OnlyAllowedCharacters(RegexValidator):
     regex = r'^[\w.@+-]+\z'
-    message='Такие символы нельзя использовать в никнейме'
-
+    message = 'Такие символы нельзя использовать в никнейме'

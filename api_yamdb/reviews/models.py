@@ -1,13 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.contrib.auth.tokens import default_token_generator
-from django.dispatch import receiver
-from django.db.models.signals import post_save
-    
+
+
 from .utils import ADMIN, MODERATOR, USER
 from .validators import OnlyAllowedCharacters, no_me_username
-
 
 
 # Прописаны роли для пользователей
@@ -60,7 +57,7 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.role == ADMIN
-    
+
     @property
     def is_user(self):
         return self.role == USER
@@ -68,7 +65,6 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == MODERATOR
-
 
 
 class Category(models.Model):
@@ -166,6 +162,12 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        constraints = (
+            models.UniqueConstraint(
+                fields=('title', 'author'),
+                name='Только одно ревью от пользователя на одно произведение'
+            ),
+        )
 
     def __str__(self):
         return self.text

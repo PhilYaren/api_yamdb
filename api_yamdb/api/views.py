@@ -1,15 +1,12 @@
-from turtle import title
+
 import uuid
 from django.core.mail import EmailMessage
-
-from rest_framework.serializers import ValidationError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework import viewsets, views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.filters import SearchFilter
@@ -17,8 +14,10 @@ from rest_framework import mixins
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-from reviews.models import Category, Genre, Title, Comment, User, Review
-from .permissions import AdminOnly, IsAdminOrReadOnly, IsModeratorAuthorOrReadOnly
+from reviews.models import Category, Genre, Title, User, Review
+from .permissions import (
+    AdminOnly, IsAdminOrReadOnly, IsModeratorAuthorOrReadOnly
+)
 from .filter import TitleFilter
 
 from .serializers import (
@@ -34,7 +33,7 @@ from .serializers import (
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = AdminSerializer
-    pagination_class = PageNumberPagination
+    ordering = ['id']
     filter_backends = (DjangoFilterBackend,)
     lookup_field = 'username'
     permission_classes = (AdminOnly, IsAuthenticated)
@@ -43,7 +42,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         methods=['GET', 'PATCH'],
         url_path='me',
-        permission_classes = (IsAuthenticated,),
+        permission_classes=(IsAuthenticated,),
         detail=False
     )
     def get_your_info(self, request):
@@ -90,6 +89,7 @@ class UserSignupViewSet(views.APIView):
         email.send()
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
+
 class TokenViewSet(views.APIView):
     def post(self, request):
         serializer = TokenSerializer(
@@ -101,10 +101,10 @@ class TokenViewSet(views.APIView):
         if user.confirmation_code == serializer.data['confirmation_code']:
             access_token = str(AccessToken.for_user(user))
             return Response(
-                data={'token':access_token},
+                data={'token': access_token},
                 status=status.HTTP_200_OK)
         return Response(
-            data={'token':'Не верный токен'},
+            data={'token': 'Не верный токен'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -148,7 +148,8 @@ class CategoryViewSet(
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes=(IsModeratorAuthorOrReadOnly,)
+    permission_classes = (IsModeratorAuthorOrReadOnly,)
+
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         rewiews = title.reviews.all()
@@ -162,6 +163,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsModeratorAuthorOrReadOnly,)
+
     def get_queryset(self):
         title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
         review = title.reviews.get(id=self.kwargs.get('review_id'))
@@ -173,4 +175,3 @@ class CommentViewSet(viewsets.ModelViewSet):
             Review,
             id=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
-
