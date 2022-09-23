@@ -1,6 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name', 'last_name',
             'bio', 'role'
         )
-        read_only_fields = ['role']
+        read_only_fields = ('role')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        read_only_fields = ('author', 'pub_date')
+        read_only_fields = ('review') # 'author' ?
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -71,30 +71,42 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    def validate(self, attrs):
-        request = self.context.get('request')
-        user = request.user
-        method = request.method
-        id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, id=id)
-        if (
-            method == 'POST'
-            and Review.objects.filter(title=title, author=user).exists()
-        ):
+    # def validate(self, attrs):
+    #     request = self.context.get('request')
+    #     user = request.user
+    #     method = request.method
+    #     id = self.context.get('view').kwargs.get('title_id')
+    #     title = get_object_or_404(Title, id=id)
+    #     if (
+    #         method == 'POST'
+    #         and Review.objects.filter(title=title, author=user).exists()
+    #     ):
+    #         raise ValidationError('Вы уже оставили отзыв на это произведение')
+    #     else:
+    #         return super().validate(attrs)
+    def validate(self, data):
+        request = self.context['request']
+        if request.method != 'POST':
+            return data
+        title_id = self.context['view'].kwargs.get('title_id')
+        title = get_object_or_404(Title, pk=title_id)
+        if Review.objects.filter(title=title,
+                                 author=request.user).exists():
             raise ValidationError('Вы уже оставили отзыв на это произведение')
-        else:
-            return super().validate(attrs)
+        return data
 
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        read_only_fields = ('id', 'author', 'pub_date')
+        read_only_fields = ('title')
 
     def validate_score(self, value):
         if 0 <= value <= 10:
             return value
         else:
             raise ValidationError('Рейтинг может быть только от 0 до 10')
+    # def get_rating(self, obj):
+    #     return obj.rating or None        
 
 
 class TitleSerializer(serializers.ModelSerializer):
