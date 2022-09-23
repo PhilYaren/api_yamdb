@@ -11,10 +11,10 @@ from .views import (
 app_name = 'api'
 router = SimpleRouter()
 
-router.register('users', UserViewSet)
-router.register('categories', CategoryViewSet)
-router.register('genres', GenreViewSet)
-router.register('titles', TitleViewSet)
+router.register('users', UserViewSet, basename='users')
+router.register('categories', CategoryViewSet, basename='categories')
+router.register('genres', GenreViewSet, basename='genres')
+router.register('titles', TitleViewSet, basename='titles')
 router.register(
     r'titles/(?P<title_id>[\d]+)/reviews',
     ReviewViewSet, basename='reviews'
@@ -25,9 +25,12 @@ router.register(
     basename='comments'
 )
 
+auth_patterns = [
+    path('signup/', UserSignupViewSet.as_view(), name='get_token'),
+    path('token/', TokenViewSet.as_view(), name='sign_up')
+]
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/signup/', UserSignupViewSet.as_view(), name='get_token'),
-    path('auth/token/', TokenViewSet.as_view(), name='sign_up')
+    path('auth/', include(auth_patterns))
 ]
