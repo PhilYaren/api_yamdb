@@ -89,19 +89,19 @@ class UserSignupViewSet(views.APIView):
     #     )
     #     serializer.is_valid(raise_exception=True)
     #     user = serializer.save(confirmation_code=uuid.uuid4())
-    #     email_text = (
-    #         f'''
-    #         Добрый день, {user.username}!
-    #         Спасибо что зарегистрировались в нашем приложении.
-    #         Dаш код доступа - {user.confirmation_code}.
-    #         '''
-    #     )
-    #     email = EmailMessage(
-    #         to=[user.email],
-    #         subject='Регистрация на YAMDB',
-    #         body=email_text
-    #     )
-    #     email.send()
+        # email_text = (
+        #     f'''
+        #     Добрый день, {user.username}!
+        #     Спасибо что зарегистрировались в нашем приложении.
+        #     Dаш код доступа - {user.confirmation_code}.
+        #     '''
+        # )
+        # email = EmailMessage(
+        #     to=[user.email],
+        #     subject='Регистрация на YAMDB',
+        #     body=email_text
+        # )
+        # email.send()
     #     return Response(data=serializer.data, status=status.HTTP_200_OK)
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
@@ -112,6 +112,20 @@ class UserSignupViewSet(views.APIView):
             user = User.objects.get_or_create(
                 username=username, email=email
             )[0]
+            email_text = (
+                f'''
+                Добрый день, {user.username}!
+                Спасибо что зарегистрировались в нашем приложении.
+                Dаш код доступа - {user.confirmation_code}.
+                '''
+            )
+            email = EmailMessage(
+                to=[user.email],
+                subject='Регистрация на YAMDB',
+                body=email_text,
+                from_email='ffff'
+            )
+            email.send()
         except IntegrityError:
             if User.objects.filter(username=username).exists():
                 return Response(
