@@ -1,4 +1,4 @@
-import uuid
+# import uuid
 
 from django.core.mail import EmailMessage
 from django.db import IntegrityError

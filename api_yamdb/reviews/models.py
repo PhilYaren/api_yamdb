@@ -3,10 +3,15 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-
-from .utils import ADMIN, MODERATOR, USER
+from api_yamdb.settings import (
+    USER_USERNAME_LENGTH, USER_FNAME_LENGTH,
+    USER_LNAME_LENGTH, USER_EMAIL_LENGTH,
+    USER_CONFIRM_CODE_LENGTH, CATEGORYGENRE_NAME_LENGTH,
+    CATEGORYGENRE_SLUG_LENGTH, TITLE_NAME_LENGTH,
+    TITLE_DESCRIPTION_LENGTH
+)
 from .validators import OnlyAllowedCharacters, no_me_username
-
+from .utils import ADMIN, MODERATOR, USER
 
 # Прописаны роли для пользователей
 USER_ROLES = (
@@ -19,7 +24,7 @@ USER_ROLES = (
 class User(AbstractUser):
     '''Переопределение полей пользователя'''
     username = models.CharField(
-        max_length=150,
+        max_length=USER_USERNAME_LENGTH,
         verbose_name='Юзернейм',
         validators=(
             no_me_username,  # Запрет на имя me
@@ -29,18 +34,18 @@ class User(AbstractUser):
         unique=True
     )
     first_name = models.CharField(
+        max_length=USER_FNAME_LENGTH,
         verbose_name='Имя',
-        max_length=150,
         blank=True
     )
     last_name = models.CharField(
+        max_length=USER_LNAME_LENGTH,
         verbose_name='Фамилия',
-        max_length=150,
         blank=True
     )
     email = models.EmailField(
         verbose_name='Почта',
-        max_length=254,
+        max_length=USER_EMAIL_LENGTH,
         blank=False,
         unique=True
     )
@@ -56,7 +61,7 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(
         verbose_name='Код подтверждения',
-        max_length=256,
+        max_length=USER_CONFIRM_CODE_LENGTH,
         null=True
     )
 
@@ -78,8 +83,8 @@ class User(AbstractUser):
 
 class CategoryGenre(models.Model):
     '''Абстрактная модель жанров и категорий'''
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=CATEGORYGENRE_NAME_LENGTH)
+    slug = models.SlugField(max_length=CATEGORYGENRE_SLUG_LENGTH, unique=True)
 
     class Meta:
         abstract = True
@@ -111,7 +116,7 @@ class Genre(CategoryGenre):
 class Title(models.Model):
     name = models.CharField(
         'Название',
-        max_length=200,
+        max_length=TITLE_NAME_LENGTH,
         db_index=True
     )
     year = models.SmallIntegerField(
@@ -134,7 +139,7 @@ class Title(models.Model):
     )
     description = models.TextField(
         'Описание',
-        max_length=255,
+        max_length=TITLE_DESCRIPTION_LENGTH,
         null=True,
         blank=True
     )
