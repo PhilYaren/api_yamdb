@@ -38,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name', 'last_name',
             'bio', 'role'
         )
-        read_only_fields = ('role')
+        read_only_fields = ('role',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
-        read_only_fields = ('review') # 'author' ?
+        read_only_fields = ('review',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -98,7 +98,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        read_only_fields = ('title')
+        read_only_fields = ('title',)
 
     def validate_score(self, value):
         if 0 <= value <= 10:
