@@ -4,8 +4,7 @@ from django.db import models
 from django.utils import timezone
 
 from api_yamdb.settings import (
-    USER_USERNAME_LENGTH, USER_FNAME_LENGTH,
-    USER_LNAME_LENGTH, USER_EMAIL_LENGTH,
+    USER_NAMES_LENGTH, USER_EMAIL_LENGTH,
     USER_CONFIRM_CODE_LENGTH, CATEGORYGENRE_NAME_LENGTH,
     CATEGORYGENRE_SLUG_LENGTH, TITLE_NAME_LENGTH,
     TITLE_DESCRIPTION_LENGTH
@@ -24,7 +23,7 @@ USER_ROLES = (
 class User(AbstractUser):
     '''Переопределение полей пользователя'''
     username = models.CharField(
-        max_length=USER_USERNAME_LENGTH,
+        max_length=USER_NAMES_LENGTH,
         verbose_name='Юзернейм',
         validators=(
             no_me_username,  # Запрет на имя me
@@ -34,12 +33,12 @@ class User(AbstractUser):
         unique=True
     )
     first_name = models.CharField(
-        max_length=USER_FNAME_LENGTH,
+        max_length=USER_NAMES_LENGTH,
         verbose_name='Имя',
         blank=True
     )
     last_name = models.CharField(
-        max_length=USER_LNAME_LENGTH,
+        max_length=USER_NAMES_LENGTH,
         verbose_name='Фамилия',
         blank=True
     )
