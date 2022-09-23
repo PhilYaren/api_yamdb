@@ -106,7 +106,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         else:
             raise ValidationError('Рейтинг может быть только от 0 до 10')
     # def get_rating(self, obj):
-    #     return obj.rating or None        
+    #     return obj.rating or None
 
 
 class TitleSerializer(serializers.ModelSerializer):
