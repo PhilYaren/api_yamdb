@@ -10,6 +10,6 @@ def no_me_username(value):
 
 
 class OnlyAllowedCharacters(RegexValidator):
-    regex = r'^[\w.@+-]+\z'
+    regex = r'^[-a-zA-Z0-9_@.+]+'
     message = 'Такие символы нельзя использовать в никнейме'
     code = 'invalid_username'

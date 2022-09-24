@@ -111,6 +111,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 5,
 }
@@ -120,11 +121,11 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+MAIN_EMAIL = 'yamy@yamdb.com'
+
 USER_NAMES_LENGTH = 150
 USER_EMAIL_LENGTH = 254
-USER_CONFIRM_CODE_LENGTH = 256
-CATEGORYGENRE_NAME_LENGTH = 256
+CONF_CODE_GENRECAT_LENGTH = 256
 CATEGORYGENRE_SLUG_LENGTH = 50
 TITLE_NAME_LENGTH = 200
 TITLE_DESCRIPTION_LENGTH = 255
-

@@ -5,9 +5,8 @@ from django.utils import timezone
 
 from api_yamdb.settings import (
     USER_NAMES_LENGTH, USER_EMAIL_LENGTH,
-    USER_CONFIRM_CODE_LENGTH, CATEGORYGENRE_NAME_LENGTH,
-    CATEGORYGENRE_SLUG_LENGTH, TITLE_NAME_LENGTH,
-    TITLE_DESCRIPTION_LENGTH
+    CONF_CODE_GENRECAT_LENGTH, CATEGORYGENRE_SLUG_LENGTH,
+    TITLE_NAME_LENGTH, TITLE_DESCRIPTION_LENGTH
 )
 from .validators import OnlyAllowedCharacters, no_me_username
 from .utils import ADMIN, MODERATOR, USER
@@ -60,7 +59,7 @@ class User(AbstractUser):
     )
     confirmation_code = models.CharField(
         verbose_name='Код подтверждения',
-        max_length=USER_CONFIRM_CODE_LENGTH,
+        max_length=CONF_CODE_GENRECAT_LENGTH,
         null=True
     )
 
@@ -82,7 +81,7 @@ class User(AbstractUser):
 
 class CategoryGenre(models.Model):
     '''Абстрактная модель жанров и категорий'''
-    name = models.CharField(max_length=CATEGORYGENRE_NAME_LENGTH)
+    name = models.CharField(max_length=CONF_CODE_GENRECAT_LENGTH)
     slug = models.SlugField(max_length=CATEGORYGENRE_SLUG_LENGTH, unique=True)
 
     class Meta:
