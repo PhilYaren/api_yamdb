@@ -77,8 +77,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        return Response(data=serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class UserSignupViewSet(views.APIView):
@@ -91,22 +90,6 @@ class UserSignupViewSet(views.APIView):
             user = User.objects.get_or_create(
                 username=username, email=email
             )[0]
-            user.confirmattion_code = uuid.uuid4()
-            user.save()
-            email_text = (
-                f'''
-                Добрый день, {user.username}!
-                Спасибо что зарегистрировались в нашем приложении.
-                Ваш код доступа - {user.confirmation_code}.
-                '''
-            )
-            email = EmailMessage(
-                to=[user.email],
-                subject='Регистрация на YAMDB',
-                body=email_text,
-                from_email=settings.MAIN_EMAIL
-            )
-            email.send()
         except IntegrityError:
             if User.objects.filter(username=username).exists():
                 return Response(
@@ -117,6 +100,22 @@ class UserSignupViewSet(views.APIView):
                 SIGNUP_ERROR.format(value=email, field='email'),
                 status=status.HTTP_400_BAD_REQUEST
             )
+        user.confirmattion_code = uuid.uuid4()
+        user.save()
+        email_text = (
+            f'''
+            Добрый день, {user.username}!
+            Спасибо что зарегистрировались в нашем приложении.
+            Ваш код доступа - {user.confirmation_code}.
+            '''
+        )
+        email = EmailMessage(
+            to=[user.email],
+            subject='Регистрация на YAMDB',
+            body=email_text,
+            from_email=settings.MAIN_EMAIL
+        )
+        email.send()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -126,7 +125,7 @@ class TokenViewSet(views.APIView):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(User, username=request.data.get('username'))
+        user = get_object_or_404(User, serializer.validated_data.get('username'))
         if (
             user.confirmation_code
             == serializer.validated_data['confirmation_code']
