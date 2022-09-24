@@ -123,6 +123,11 @@ POST /api/v1/auth/token/
 http://127.0.0.1:8000/redoc/
 ```
 
+## Наполнение базы данных:
+```zsh
+python manage.py get_data_from_csv
+```
+
 Команда разработки:
 #### [Ярослав Филиппов](https://github.com/PhilYaren)
 #### [Юлия Суркова](https://github.com/Juliosity)
