@@ -77,6 +77,7 @@ class GenreAdmin(admin.ModelAdmin):
     )
     search_fields = ('name',)
 
+
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Review, ReviewsAdmin)
 admin.site.register(Title, TitleAdmin)
