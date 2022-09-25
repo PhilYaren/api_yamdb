@@ -119,7 +119,6 @@ class TokenViewSet(views.APIView):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    # Реализовал непосредственно в запросе)
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).order_by('name')
