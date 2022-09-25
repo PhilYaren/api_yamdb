@@ -169,7 +169,6 @@ class ReviewComment(models.Model):
     class Meta:
         abstract = True
         ordering = ['-pub_date']
-        default_related_name = '%(class)ss'
 
     def __str__(self):
         return self.text[:50]
@@ -199,6 +198,7 @@ class Review(ReviewComment):
     class Meta(ReviewComment.Meta):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        default_related_name = 'reviews'
         constraints = (
             models.UniqueConstraint(
                 fields=('title', 'author'),
@@ -217,3 +217,4 @@ class Comment(ReviewComment):
     class Meta(ReviewComment.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+        default_related_name = 'comments'
