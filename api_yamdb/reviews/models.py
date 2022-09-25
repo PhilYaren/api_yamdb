@@ -87,7 +87,7 @@ class CategoryGenre(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['name']
+        ordering = ('name',)
 
     def __str__(self) -> str:
         return self.name
@@ -113,7 +113,7 @@ class Title(models.Model):
         max_length=settings.TITLE_NAME_LENGTH,
         db_index=True
     )
-    year = models.SmallIntegerField(
+    year = models.PositiveSmallIntegerField(
         verbose_name='год',
         validators=(
             DynamicMaxYearValidator(
@@ -168,7 +168,7 @@ class ReviewComment(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['-pub_date']
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text[:50]
@@ -180,7 +180,7 @@ class Review(ReviewComment):
         on_delete=models.CASCADE,
         verbose_name='Произведение'
     )
-    score = models.SmallIntegerField(
+    score = models.PositiveSmallIntegerField(
         verbose_name='Оценка',
         default=5,
         validators=(

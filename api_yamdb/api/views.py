@@ -5,7 +5,6 @@ from django.core.mail import EmailMessage
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-
 from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -120,8 +119,10 @@ class TokenViewSet(views.APIView):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    ordering = ['-year']
+    # Реализовал непосредственно в запросе)
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).order_by('name')
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitleFilter
 
