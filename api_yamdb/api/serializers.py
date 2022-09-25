@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404
+from django.core.validators import MinValueValidator, MaxValueValidator
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .validators import UsernameValidatorMixin
+# from .validators import UsernameValidatorMixin
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.validators import UsernameValidatorMixin
 
 
 class AdminSerializer(
@@ -72,8 +74,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
     score = serializers.IntegerField(
-        min_value=1,
-        max_value=10
+        validators=(MinValueValidator(1), MaxValueValidator(10))
     )
 
     class Meta:
@@ -123,5 +124,4 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = ('name', 'year', 'description', 'genre', 'category')
 
     def to_representation(self, instance):
-        serializer = TitleSerializer(instance)
-        return serializer.data
+        return TitleSerializer(instance).data

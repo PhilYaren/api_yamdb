@@ -1,18 +1,19 @@
 import uuid
 
+from django.conf import settings
 from django.core.mail import EmailMessage
 from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from rest_framework import mixins, status, views, viewsets
+from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .filter import TitleFilter
+from .mixins import WorkingWithListViewSet
 from .permissions import (
     AdminOnly, IsAdminOrReadOnly, IsModeratorAuthorOrReadOnly
 )
@@ -24,26 +25,9 @@ from .serializers import (
     TitlePostSerializer
 )
 from reviews.models import Category, Genre, Title, User, Review
-from api_yamdb.settings import MAIN_EMAIL
 
 
 SIGNUP_ERROR = '{value} уже занят. Используйте другой {field}.'
-
-
-class WorkingWithListViewSet(
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
-    pass
-
-
-class GenreCategoryViewSet(WorkingWithListViewSet):
-    permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -51,7 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = AdminSerializer
     ordering = ['id']
     lookup_field = 'username'
-    permission_classes = (AdminOnly, IsAuthenticated)
+    permission_classes = (AdminOnly,)
     search_fields = ('username',)
 
     @action(
@@ -71,8 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
-        return Response(data=serializer.data)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 class UserSignupViewSet(views.APIView):
@@ -82,25 +65,9 @@ class UserSignupViewSet(views.APIView):
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
         try:
-            user = User.objects.get_or_create(
+            user, created = User.objects.get_or_create(
                 username=username, email=email
-            )[0]
-            user.confirmattion_code = uuid.uuid4()
-            user.save()
-            email_text = (
-                f'''
-                Добрый день, {user.username}!
-                Спасибо что зарегистрировались в нашем приложении.
-                Ваш код доступа - {user.confirmation_code}.
-                '''
             )
-            email = EmailMessage(
-                to=[user.email],
-                subject='Регистрация на YAMDB',
-                body=email_text,
-                from_email=MAIN_EMAIL
-            )
-            email.send()
         except IntegrityError:
             if User.objects.filter(username=username).exists():
                 return Response(
@@ -111,6 +78,22 @@ class UserSignupViewSet(views.APIView):
                 SIGNUP_ERROR.format(value=email, field='email'),
                 status=status.HTTP_400_BAD_REQUEST
             )
+        user.confirmattion_code = uuid.uuid4()
+        user.save()
+        email_text = (
+            f'''
+            Добрый день, {user.username}!
+            Спасибо что зарегистрировались в нашем приложении.
+            Ваш код доступа - {user.confirmation_code}.
+            '''
+        )
+        email = EmailMessage(
+            to=[user.email],
+            subject='Регистрация на YAMDB',
+            body=email_text,
+            from_email=settings.MAIN_EMAIL
+        )
+        email.send()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -120,7 +103,8 @@ class TokenViewSet(views.APIView):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(User, username=request.data.get('username'))
+        user = get_object_or_404(
+            User, username=serializer.validated_data.get('username'))
         if (
             user.confirmation_code
             == serializer.validated_data['confirmation_code']
@@ -137,7 +121,7 @@ class TokenViewSet(views.APIView):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    ordering = ['name']
+    ordering = ['-year']
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitleFilter
 
@@ -147,12 +131,12 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitlePostSerializer
 
 
-class GenreViewSet(GenreCategoryViewSet):
+class GenreViewSet(WorkingWithListViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
-class CategoryViewSet(GenreCategoryViewSet):
+class CategoryViewSet(WorkingWithListViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 

@@ -62,7 +62,7 @@ class TitleAdmin(admin.ModelAdmin):
     list_filter = ('genre', 'category', 'year')
 
 
-class CategoryGenreAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = (
         'name',
         'slug'
@@ -70,9 +70,16 @@ class CategoryGenreAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+class GenreAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'slug'
+    )
+    search_fields = ('name',)
+
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Review, ReviewsAdmin)
 admin.site.register(Title, TitleAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(Category, CategoryGenreAdmin)
-admin.site.register(Genre, CategoryGenreAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
