@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
@@ -29,27 +28,6 @@ from reviews.models import Category, Genre, Title, User, Review
 
 
 SIGNUP_ERROR = '{value} уже занят. Используйте другой {field}.'
-
-
-# class WorkingWithListViewSet(
-#     mixins.CreateModelMixin,
-#     mixins.DestroyModelMixin,
-#     mixins.ListModelMixin,
-#     viewsets.GenericViewSet
-# ):
-#     pass
-
-
-# class GenreCategoryViewSet(
-#     mixins.CreateModelMixin,
-#     mixins.DestroyModelMixin,
-#     mixins.ListModelMixin,
-#     viewsets.GenericViewSet
-#     ):
-#     permission_classes = (IsAdminOrReadOnly,)
-#     filter_backends = (SearchFilter,)
-#     search_fields = ('name',)
-#     lookup_field = 'slug'
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -87,9 +65,9 @@ class UserSignupViewSet(views.APIView):
         username = serializer.validated_data.get('username')
         email = serializer.validated_data.get('email')
         try:
-            user = User.objects.get_or_create(
+            user, created = User.objects.get_or_create(
                 username=username, email=email
-            )[0]
+            )
         except IntegrityError:
             if User.objects.filter(username=username).exists():
                 return Response(
@@ -125,7 +103,8 @@ class TokenViewSet(views.APIView):
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
-        user = get_object_or_404(User, serializer.validated_data.get('username'))
+        user = get_object_or_404(
+            User, username=serializer.validated_data.get('username'))
         if (
             user.confirmation_code
             == serializer.validated_data['confirmation_code']
@@ -142,7 +121,7 @@ class TokenViewSet(views.APIView):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    ordering = ['name']
+    ordering = ['-year']
     permission_classes = (IsAdminOrReadOnly,)
     filterset_class = TitleFilter
 
